@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Chamada de Senha</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/animate.css" rel="stylesheet">
+    <link href="fonts/ubuntu/ubuntu.css" rel="stylesheet">
+    <style media="screen">
+      body {
+        background: dodgerblue;
+        font-family: ubunturegular, sans-serif;
+        overflow: hidden;
+      }
+
+      #content {
+        width: 95%;
+        height: 95%;
+        margin: 0 auto;
+        text-align: center;
+      }
+
+      .senha_titulo {
+        color: white;
+        font-size: 8vw;
+        width: 100%;
+        left: 0px;
+        height: 12vw;
+        display: block;
+        text-align: center;
+        position: absolute;
+        top: -2vw;
+      }
+
+      .noselect {
+      	  -webkit-touch-callout: none; /* iOS Safari */
+      	  -webkit-user-select: none;   /* Chrome/Safari/Opera */
+      	  -khtml-user-select: none;    /* Konqueror */
+      	  -moz-user-select: none;      /* Firefox */
+      	  -ms-user-select: none;       /* IE/Edge */
+      	  user-select: none;           /* non-prefixed version, currently not supported by any browser */
+          cursor: default;
+    	}
+
+
+      #senha_numero {
+        font-size: 30vw;
+        color: yellow;
+        position: absolute;
+        font-family: ubuntubold, sans-serif;
+        left: 0px;
+        right: 0px;
+        top: 2vw;
+        font-weight: bold;
+      }
+
+      #ultimos_numeros:before {
+        content: 'Números chamados';
+        position: absolute;
+        color: white;
+        font-size: 3vw;
+        top: -4vw;
+        margin-left: 40px;
+      }
+
+      #ultimos_numeros {
+        width: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        position: absolute;;
+        bottom: 0px;
+        height: 30vh;
+      }
+
+      .numero_prev {
+        font-size: 8vw;
+        float: left;
+        color: white;
+        width: 25%;
+        text-align: center;
+        border-right: 1px dashed white;
+        height: 100%;
+      }
+
+    </style>
+  </head>
+  <body class="noselect">
+    <div id="content">
+      <span class="senha_titulo">SENHA<br>
+      <span id="senha_numero"></span></span>
+
+    </div>
+    <div id="ultimos_numeros">
+      <div class="numero_prev" id="numero_um"></div>
+      <div class="numero_prev" id="numero_dois"></div>
+      <div class="numero_prev" id="numero_tres"></div>
+      <div class="numero_prev" style="border-right: 0px solid white !important;" id="numero_quatro"></div>
+      <div style="clear:both;"></div>
+    </div>
+
+
+    <script src="js/jquery.js"></script>
+    <script src="js/socket.io.min.js"></script>
+    <script type="text/javascript">
+    var socket = io.connect("http://localhost:3131");
+
+    var senhas = [];
+
+    var audio = new Audio("audio.wav");
+
+
+    socket.on("update lista chamados", function (payload) {
+      var lista = payload.lista;
+      lista = lista.reverse();
+      	
+      if (lista[0]) {
+      	$("#senha_numero").html(lista[0].id);
+      	audio.play();
+      }
+
+	  if (lista[1]) $("#numero_um").html(lista[1].id);
+	  if (lista[2]) $("#numero_dois").html(lista[2].id);
+	  if (lista[3]) $("#numero_tres").html(lista[3].id);
+	  if (lista[4]) $("#numero_quatro").html(lista[4].id);
+      
+    });
+
+    socket.on("database apagado", function (payload) {
+
+    });
+
+    socket.on("senha chama_numero", function (payload) {
+      $("#senha_numero").html(payload.numero);
+
+      if (payload.numero == senhas[0]) {
+        $('#senha_numero').addClass('animated shake');
+      } else {
+        $('#senha_numero').addClass('animated flash');
+      }
+
+      $('#senha_numero').one('webkitAnimationEnd animationend', function(){
+        document.getElementById('senha_numero').className = "";
+      });
+
+
+      audio.play();
+
+      if (payload.numero != senhas[0] && payload.numero != senhas[1] && payload.numero != senhas[2]
+      && payload.numero != senhas[3] && payload.numero != senhas[4]) {
+        senhas.unshift(payload.numero);
+
+        if (senhas.length > 5) {
+          senhas.pop();
+        }
+
+        $("#numero_um").html(senhas[1]);
+        $("#numero_dois").html(senhas[2]);
+        $("#numero_tres").html(senhas[3]);
+        $("#numero_quatro").html(senhas[4]);
+
+
+        $('.numero_prev').addClass('animated bounceInLeft');
+
+        $('.numero_prev').one('webkitAnimationEnd animationend', function(){
+          $(this)[0].className = "numero_prev";
+        });
+
+      }
+
+    });
+
+
+    </script>
+  </body>
+</html>

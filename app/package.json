@@ -1,0 +1,10 @@
+{
+  "name": "CDS",
+  "version": "1.0.0",
+  "description": "Chamada de Senhas",
+  "main": "app.js",
+  "author": "Pedro Henrique",
+  "scripts": {
+    "start": "electron ."
+  }
+}

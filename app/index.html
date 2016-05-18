@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Chamada de Senha</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="roboto.css" rel="stylesheet">
+    <link href="fonts/ubuntu/ubuntu.css" rel="stylesheet">
+    <style media="screen">
+      body {
+        background: dodgerblue;
+        font-family: ubunturegular, sans-serif;
+      }
+
+      .noselect {
+      	  -webkit-touch-callout: none; /* iOS Safari */
+      	  -webkit-user-select: none;   /* Chrome/Safari/Opera */
+      	  -khtml-user-select: none;    /* Konqueror */
+      	  -moz-user-select: none;      /* Firefox */
+      	  -ms-user-select: none;       /* IE/Edge */
+      	  user-select: none;           /* non-prefixed version, currently not supported by any browser */
+          cursor: default;
+    	}
+
+      #chamada_home {
+        width: 50%;
+        float: left;
+        position: relative;
+        top: -40px;
+      }
+
+      #lista_home {
+        width: 50%;
+        float: left;
+        position: relative;
+        top: -40px;
+        height: 450px;
+      }
+
+      .titulo {
+        font-size: 22px;
+        font-weight: bold;
+        color: dodgerblue;
+        display: block;
+        width: 100%;
+        text-align: center;
+      }
+
+      #lista_conteudo {
+        overflow: scroll;
+        overflow-x: hidden;
+        height: 90%;
+        background: white;
+      }
+
+
+
+      #lista_senha_confirmadas {
+        overflow: scroll;
+        overflow-x: hidden;
+        height: 200px;;
+        background: white;
+      }
+
+      .jumbotron {
+        padding-bottom: 0px !important;
+        padding-left: 5px !important;
+        padding-right: 5px !important;
+      }
+
+      .content_wrap_fix {
+        width: 50%;
+        margin: 0 auto;
+      }
+
+      .btn-fix-size-more {
+        width: 150px;
+        font-size: 18px;
+      }
+
+      .lista_numero_chamado {
+        width: 100%;
+        margin-bottom: 2px;
+        margin-top: 2px;
+      }
+
+      .lista_numero_chamado:nth-child(even) {
+          background: #A8D8D8;
+      }
+
+      .lista_numero_chamado:nth-child(odd) {
+        background: #D8F0F0;
+      }
+
+      .lista_numero_chamado .numero {
+        font-size: 22px;
+        width: 70px;;
+        height: 34px;
+        line-height: 34px;
+        display: block;
+        float: left;
+      }
+
+      .fix_display_buttons {
+        width: 100px;
+        float: right;
+      }
+    </style>
+  </head>
+  <body class="noselect">
+    <br>
+    <div class="container">
+
+     <!-- Static navbar -->
+     <nav class="navbar navbar-default">
+       <div class="container-fluid">
+         <div class="navbar-header">
+           <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+             <span class="sr-only">Toggle navigation</span>
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+           </button>
+           <a class="navbar-brand">Chamada de Senhas</a>
+         </div>
+         <div id="navbar" class="navbar-collapse collapse">
+           <ul class="nav navbar-nav navbar-right">
+             <li><button class="btn" onclick="abrir_painel();" style="margin-top: 7px;"><i class="fa fa-desktop" aria-hidden="true"></i></button></li>
+           </ul>
+         </div><!--/.nav-collapse -->
+       </div><!--/.container-fluid -->
+     </nav>
+
+     <!-- Main component for a primary marketing message or call to action -->
+     <div class="jumbotron">
+
+       <div id="chamada_home">
+         <span class="titulo">Chamar senha</span>
+         <br>
+         <div class="content_wrap_fix">
+           <form onsubmit="$('#chamar_btn_fn').click();return false;">
+           <input type="number" min="1" max="99999" class="form-control" id="senha_val_fn" placeholder="Senha"><br>
+          </form>
+          <center>
+           <button class="btn btn-fix-size-more btn-primary" id="chamar_btn_fn">Chamar</button>
+         </center>
+         </div>
+         <br><br><br>
+         <div id="senhas_confirmadas">
+           <span class="titulo">Senhas Confirmadas</span>
+           <br>
+           <div id="lista_senha_confirmadas">
+
+           </div>
+
+         </div>
+
+       </div>
+
+       <div id="lista_home">
+         <span class="titulo">Senhas chamadas</span>
+         <br>
+
+         <div id="lista_conteudo">
+
+
+
+         </div>
+
+
+       </div>
+       <style>
+       #database_configs {
+         width: 100%;
+         text-align: right;
+         padding-right: 10px;
+         padding-bottom: 10px;
+       }
+
+       #database_configs .btn {
+         font-size: 10px;
+       }
+
+       .credits {
+         color: rgb(100, 100, 100);
+         font-weight: bold;
+       }
+
+       </style>
+       <div id="database_configs">
+         <button id="apagar_banco_de_dados" onclick="apagar_database();" class="btn btn-danger">Apagar banco de dados</button>
+       </div>
+       <div style="clear:both;"></div>
+       <span class="credits">Pedro  Henrique - pedrohenrique.ninja</span>
+     </div>
+
+   </div> <!-- /container -->
+
+
+  <script src="js/jquery.js"></script>
+  <script src="js/socket.io.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script type="text/javascript">
+    var socket = io.connect("http://localhost:3131");
+
+    var recebeu_dados_db_chamados = false;
+    var recebeu_dados_db_comparecidos = false;
+
+    socket.on("update lista chamados", function (payload) {
+      if (recebeu_dados_db_chamados == false) {
+        recebeu_dados_db_chamados = true;
+        var lista = payload.lista;
+
+        console.log("cham");
+        console.log(lista);
+
+        for(var i = 0; i < lista.length; i++) {
+          var insert_code = '<div class="lista_numero_chamado" data-numero="' + lista[i].id + '"><span class="numero">' + lista[i].id + '</span><div class="fix_display_buttons"><button onclick="chamar_novamente(' + lista[i].id +')" class="btn btn-warning"><i class="fa fa-bullhorn" aria-hidden="true"></i></button> <span> </span><button  onclick="confirmar_comparecimento(' + lista[i].id +')" class="btn btn-success"><i class="fa fa-check" aria-hidden="true"></i></button></div><div style="clear:both;"></div></div>'
+          $("#lista_conteudo").html(insert_code + $("#lista_conteudo").html());
+        }
+      }
+    });
+
+    socket.on("update lista comparecido", function (payload) {
+      if (recebeu_dados_db_comparecidos == false) {
+        recebeu_dados_db_comparecidos = true;
+        var lista = payload.lista;
+        console.log("comp");
+        console.log(lista);
+
+        for(var i = 0; i < lista.length; i++) {
+          var preset_confirmadas = '<div class="lista_numero_chamado" data-numero="' + lista[i].id + '"><span class="numero">' + lista[i].id + '</span><div class="fix_display_buttons"><button style="float:right;" onclick="chamar_novamente(' + lista[i].id +')" class="btn btn-warning"><i class="fa fa-bullhorn" aria-hidden="true"></i></button> <span> </span></div><div style="clear:both;"></div></div>';
+          $("#lista_senha_confirmadas").html(preset_confirmadas + $("#lista_senha_confirmadas").html());
+        }
+      }
+    });
+
+    socket.on("database apagado", function (payload) {
+      $("#lista_senha_confirmadas").html("");
+      $("#lista_conteudo").html("");
+      alert("Banco de dados apagado com sucesso!")
+    });
+
+    function chamar_novamente(numero) {
+      socket.emit('senha chama_numero', {
+        numero: numero
+      });
+    }
+
+    function apagar_database() {
+      socket.emit('apagar database', {});
+    }
+
+    function abrir_painel() {
+      socket.emit('abrir janela senha', {});
+    }
+
+    function confirmar_comparecimento(numero) {
+      socket.emit('senha confirma_comparecimento', {
+        numero: numero
+      });
+
+      $("[data-numero='" + numero + "']").remove();
+
+      var preset_confirmadas = '<div class="lista_numero_chamado" data-numero="' + numero + '"><span class="numero">' + numero + '</span><div class="fix_display_buttons"><button style="float:right;" onclick="chamar_novamente(' + numero +')" class="btn btn-warning"><i class="fa fa-bullhorn" aria-hidden="true"></i></button> <span> </span></div><div style="clear:both;"></div></div>';
+      $("#lista_senha_confirmadas").html(preset_confirmadas + $("#lista_senha_confirmadas").html());
+
+
+    }
+
+    $("#chamar_btn_fn").on("click", function() {
+      if ($("#senha_val_fn").val() == "") {
+        alert("Informe uma senha");
+      } else if($("#senha_val_fn").val() > 99999) {
+        alert("O valor não é válido");
+      } else {
+        var senha_numero = $("#senha_val_fn").val();
+
+        socket.emit('senha chama_numero', {
+    			numero: senha_numero
+    		});
+
+        var result_numero = document.querySelectorAll("[data-numero='" + senha_numero + "']");
+
+        if (result_numero.length < 1) {
+          var insert_code = '<div class="lista_numero_chamado" data-numero="' + senha_numero + '"><span class="numero">' + senha_numero + '</span><div class="fix_display_buttons"><button onclick="chamar_novamente(' + senha_numero +')" class="btn btn-warning"><i class="fa fa-bullhorn" aria-hidden="true"></i></button> <span> </span><button  onclick="confirmar_comparecimento(' + senha_numero +')" class="btn btn-success"><i class="fa fa-check" aria-hidden="true"></i></button></div><div style="clear:both;"></div></div>'
+          $("#lista_conteudo").html(insert_code + $("#lista_conteudo").html());
+        }
+
+        $("#senha_val_fn").focus();
+
+      }
+    });
+
+
+
+  </script>
+  </body>
+</html>
