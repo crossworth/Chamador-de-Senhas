@@ -6,5 +6,9 @@
   "author": "Pedro Henrique",
   "scripts": {
     "start": "electron ."
+  },
+  "dependencies": {
+  	"socket.io": "^1.4.5",
+  	"nedb": "^1.8.0"
   }
 }
