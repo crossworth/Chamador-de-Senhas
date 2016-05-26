@@ -3,7 +3,15 @@
   "version": "1.0.0",
   "description": "Chamada de Senhas",
   "main": "app.js",
-  "author": "Pedro Henrique",
+  "author": {
+    "name": "Pedro Henrique",
+    "email": "system.pedrohenrique@gmail.com",
+    "url": "http://pedrohenrique.ninja"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/systemmovie/Chamador-de-Senhas.git"
+  },
   "scripts": {
     "start": "electron ."
   },
